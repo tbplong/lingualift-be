@@ -77,8 +77,9 @@
   },
   "lint-staged": {
     "*.ts": [
-      "bash -c 'npm lint'",
-      "npm prettier --write"
+      "npm run test:e2e",
+      "npm run lint",
+      "npm run format"
     ]
   }
 }
