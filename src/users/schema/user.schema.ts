@@ -18,9 +18,6 @@ export class User {
   public googleId: string;
 
   @Prop()
-  public appleId: string;
-
-  @Prop()
   public firstName: string;
 
   @Prop()
@@ -55,9 +52,6 @@ export class User {
 
   @Prop()
   public address: string;
-
-  @Prop({ required: true, unique: true })
-  public slug: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -1,7 +1,8 @@
 import { Controller, Post, Body } from '@nestjs/common';
-import { LoginRequestDto, LoginResponseDto } from '../dtos';
+import { LoginRequestDto, AuthResponseDto, SignupRequestDto } from '../dtos';
 import { plainToInstance } from 'class-transformer';
 import { AuthService } from '../services';
+// import { User } from '../decorators';
 
 @Controller('auth')
 export class AuthController {
@@ -10,12 +11,30 @@ export class AuthController {
   @Post('login')
   public async login(
     @Body() loginRequestDto: LoginRequestDto,
-  ): Promise<LoginResponseDto> {
+  ): Promise<AuthResponseDto> {
     const accessToken = await this.authService.logIn(loginRequestDto);
     return plainToInstance(
-      LoginResponseDto,
+      AuthResponseDto,
       { accessToken },
       { excludeExtraneousValues: true },
     );
   }
+
+  @Post('signup')
+  public async signup(
+    @Body() signupRequestDto: SignupRequestDto,
+  ): Promise<AuthResponseDto> {
+    const accessToken = await this.authService.signUp(signupRequestDto);
+    return plainToInstance(
+      AuthResponseDto,
+      { accessToken },
+      { excludeExtraneousValues: true },
+    );
+  }
+
+  // @Delete('/logout')
+  // public async logout(@User() user: Express.User): Promise<void> {
+  //   const { tokenId } = user;
+  //   await this.authService.logout(tokenId);
+  // }
 }

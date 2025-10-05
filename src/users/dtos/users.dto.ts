@@ -11,13 +11,9 @@ export class CreateUserDto {
 
   public readonly googleId: string | null;
 
-  public readonly appleId: string | null;
-
   public readonly dateOfBirth: string | null;
 
   public readonly phone: string | null;
 
   public password: string | null;
-
-  public slug: string;
 }
