@@ -10,7 +10,21 @@ export class LoginRequestDto {
   password: string;
 }
 
-export class LoginResponseDto {
+export class SignupRequestDto extends LoginRequestDto {
+  @IsNotEmpty()
+  firstName: string;
+
+  @IsNotEmpty()
+  lastName: string;
+
+  @IsNotEmpty()
+  dateOfBirth: string;
+
+  @IsNotEmpty()
+  phone: string;
+}
+
+export class AuthResponseDto {
   @Expose()
   accessToken: string;
 }
