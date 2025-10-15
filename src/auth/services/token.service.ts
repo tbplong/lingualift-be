@@ -27,7 +27,8 @@ import { Token, TokenDocument } from '../schemas';
 import { TokenCollectionName } from 'src/constants/schema';
 import * as config from '@nestjs/config';
 import { UserDocument } from 'src/users/schema';
-import { UsersService } from 'src/users/services';
+import { UsersService } from 'src/users/services/users.service';
+import { forwardRef } from '@nestjs/common';
 
 /**
  * Provides common methods for token management
@@ -38,7 +39,7 @@ export class TokenService {
 
   constructor(
     @InjectModel(TokenCollectionName) private tokenModel: Model<Token>,
-    private userService: UsersService,
+    @Inject(forwardRef(() => UsersService)) private userService: UsersService,
     private jwtService: JwtService,
     @Inject(authConfig.KEY)
     private appAuthConfig: config.ConfigType<AuthConfigType>,
@@ -54,7 +55,10 @@ export class TokenService {
     tokenInfo: TokenInfoInterface,
   ): Promise<CreateTokenResponseInterface> {
     const { userId } = tokenInfo;
-    const token = await this.tokenModel.create({ userId });
+    const token = await this.tokenModel.create({
+      userId,
+      expiredAt: dayjs().add(1, 'hour').toDate(),
+    });
     return { tokenId: token._id };
   }
 
@@ -138,8 +142,9 @@ export class TokenService {
     if (!token) {
       throw new NotFoundException('Không tìm thấy mã đăng nhập');
     }
-
-    if (dayjs().isAfter(token.expiredAt)) {
+    // console.log('expiredAt:', token.expiredAt);
+    // console.log('Current time:', dayjs().toISOString());
+    if (dayjs().isAfter(dayjs(token.expiredAt), 'second')) {
       token.isActivate = false;
       await token.save();
       return false;
