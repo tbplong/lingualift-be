@@ -17,9 +17,7 @@ export class AuthService {
     private tokenService: TokenService,
   ) {}
 
-  public async logIn(
-    loginRequestDto: LoginRequestDto,
-  ): Promise<{ access_token: string }> {
+  public async logIn(loginRequestDto: LoginRequestDto): Promise<string> {
     const { email, password } = loginRequestDto;
     const user = await this.usersService.findOne(email);
     if (!user) {
@@ -34,10 +32,7 @@ export class AuthService {
     const newToken = await this.tokenService.create({ userId: user._id });
     const payload = { tokenId: newToken.tokenId };
     const accessToken = await this.jwtService.signAsync(payload);
-    console.log('Created token:', newToken);
-    return {
-      access_token: accessToken,
-    };
+    return accessToken;
   }
 
   public async signUp(

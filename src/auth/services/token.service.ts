@@ -57,7 +57,7 @@ export class TokenService {
     const { userId } = tokenInfo;
     const token = await this.tokenModel.create({
       userId,
-      expiredAt: dayjs().add(1, 'hour').toDate(),
+      expiredAt: dayjs().add(365, 'day').toDate(),
     });
     return { tokenId: token._id };
   }

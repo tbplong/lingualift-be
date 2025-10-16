@@ -10,7 +10,7 @@ export class UsersController {
     private tokenService: TokenService,
   ) {}
 
-  @Get('profile')
+  @Get('/profile')
   public async getProfile(@Headers('authorization') authorization: string) {
     const user = await this.userService.usersProfile(authorization);
     return new UserResponseDto(user);
