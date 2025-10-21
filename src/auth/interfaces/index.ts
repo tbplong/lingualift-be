@@ -1,6 +1,12 @@
 import { TokenPayload } from 'google-auth-library';
 import { Types } from 'mongoose';
 
+export interface GoogleLoginToken {
+  accessToken: string;
+  hasPassword: boolean;
+  isFirstLogin: boolean;
+}
+
 export interface AuthResponseInterface {
   accessToken: string;
   hasPassword: boolean;
@@ -12,9 +18,6 @@ export interface GoogleProfileForNewAccountCreation {
   givenName?: string;
   familyName?: string;
   picture?: string;
-  fingerprint: string;
-  ip: string;
-  ua: string;
 }
 
 export interface AccessTokenContent {
