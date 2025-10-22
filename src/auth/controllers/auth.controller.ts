@@ -1,15 +1,18 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Delete } from '@nestjs/common';
 import { LoginRequestDto, AuthResponseDto, SignupRequestDto } from '../dtos';
 import { plainToInstance } from 'class-transformer';
-import { AuthService } from '../services';
+import { AuthService, TokenService } from '../services';
 import { Public } from '../decorators/public.decorator';
-// import { User } from '../decorators';
+import { User } from '../decorators';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private tokenService: TokenService,
+  ) {}
 
-  @Post('login')
+  @Post('/login')
   @Public()
   public async login(
     @Body() loginRequestDto: LoginRequestDto,
@@ -22,7 +25,7 @@ export class AuthController {
     );
   }
 
-  @Post('signup')
+  @Post('/signup')
   @Public()
   public async signup(
     @Body() signupRequestDto: SignupRequestDto,
@@ -35,9 +38,9 @@ export class AuthController {
     );
   }
 
-  // @Delete('/logout')
-  // public async logout(@User() user: Express.User): Promise<void> {
-  //   const { tokenId } = user;
-  //   await this.authService.logout(tokenId);
-  // }
+  @Delete('/logout')
+  public async logout(@User() user: Express.User): Promise<void> {
+    const { tokenId } = user;
+    await this.tokenService.logout(tokenId);
+  }
 }
