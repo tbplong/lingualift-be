@@ -1,5 +1,5 @@
 import { Expose } from 'class-transformer';
-import { IsEmail, IsNotEmpty } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
 export class LoginRequestDto {
   @IsEmail()
@@ -27,4 +27,21 @@ export class SignupRequestDto extends LoginRequestDto {
 export class AuthResponseDto {
   @Expose()
   accessToken: string;
+}
+
+export class GoogleLoginRequestDto {
+  @IsString()
+  @IsNotEmpty()
+  idToken: string;
+}
+
+export class GoogleLoginResponseDto {
+  @Expose()
+  accessToken: string;
+
+  @Expose()
+  hasPassword: boolean;
+
+  @Expose()
+  isFirstLogin: boolean;
 }

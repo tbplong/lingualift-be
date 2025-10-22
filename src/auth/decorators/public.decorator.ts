@@ -6,5 +6,5 @@ import { CustomDecoratorKey } from 'src/common/custom-decorator-keys';
  * This is different from `BlockIfUnauthorized` in that we don't waste any time
  * trying to authenticate the user (example use case is on proxy routes).
  */
-export const Public = (isPublic: boolean): CustomDecorator =>
-  SetMetadata(CustomDecoratorKey.PUBLIC, isPublic);
+export const Public = (): CustomDecorator =>
+  SetMetadata(CustomDecoratorKey.PUBLIC, true);

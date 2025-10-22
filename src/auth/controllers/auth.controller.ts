@@ -2,6 +2,7 @@ import { Controller, Post, Body } from '@nestjs/common';
 import { LoginRequestDto, AuthResponseDto, SignupRequestDto } from '../dtos';
 import { plainToInstance } from 'class-transformer';
 import { AuthService } from '../services';
+import { Public } from '../decorators/public.decorator';
 // import { User } from '../decorators';
 
 @Controller('auth')
@@ -9,6 +10,7 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('login')
+  @Public()
   public async login(
     @Body() loginRequestDto: LoginRequestDto,
   ): Promise<AuthResponseDto> {
@@ -21,6 +23,7 @@ export class AuthController {
   }
 
   @Post('signup')
+  @Public()
   public async signup(
     @Body() signupRequestDto: SignupRequestDto,
   ): Promise<AuthResponseDto> {
