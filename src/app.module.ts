@@ -10,6 +10,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { ExceptionsFilter } from './common/filters';
 import { AuthGuard } from './auth/guards';
+import { LoggerModule } from 'nestjs-pino';
 
 @Module({
   imports: [
@@ -23,6 +24,13 @@ import { AuthGuard } from './auth/guards';
         uri: dbConfig.connectionString,
       }),
       inject: [databaseConfig.KEY],
+    }),
+    LoggerModule.forRoot({
+      pinoHttp: {
+        customProps: () => ({
+          context: 'HTTP',
+        }),
+      },
     }),
     AuthModule,
     UsersModule,
