@@ -172,6 +172,18 @@ export class TokenService {
     return token;
   }
 
+  public async logout(tokenId: Types.ObjectId): Promise<TokenDocument> {
+    const token = await this.findById(new Types.ObjectId(tokenId));
+
+    if (!token) {
+      throw new NotFoundException('Không tìm thấy mã đăng nhập');
+    }
+
+    token.isActivate = false;
+    await token.save();
+    return token;
+  }
+
   private async findOne(
     query: FilterQuery<Token>,
     projection: ProjectionType<Token> = {},
