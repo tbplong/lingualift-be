@@ -77,7 +77,7 @@ export class TokenService {
       throw new NotFoundException('Mã đăng nhập không tồn tại');
     }
 
-    return this.userService.findById(token.userId);
+    return this.userService.findById(token.userId.toString());
   }
 
   /**

@@ -56,21 +56,12 @@ export class AuthGuard implements CanActivate {
         email: user.email,
         userId: user._id,
       };
+
+      return true;
     } catch {
-      let shouldBlock = this.getShouldBlockIfNotManager(context);
-      if (shouldBlock) {
-        throw new ForbiddenException();
-      }
-
-      shouldBlock = this.getPublic(context);
-      if (shouldBlock) {
-        throw new UnauthorizedException(
-          'Xác thực thất bại, lỗi không xác định',
-        );
-      }
+      // --- SỬA LỖI TẠI ĐÂY ---
+      throw new UnauthorizedException('Failed');
     }
-
-    return true;
   }
 
   private extractCredentialFromHeader(request: Request): {
