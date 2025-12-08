@@ -45,3 +45,32 @@ export class GoogleLoginResponseDto {
   @Expose()
   isFirstLogin: boolean;
 }
+
+export class ProfileResponseDto {
+  @Expose()
+  id: string;
+
+  @Expose()
+  email: string;
+
+  @Expose()
+  firstName: string;
+
+  @Expose()
+  lastName: string;
+
+  @Expose()
+  level: string;
+
+  @Expose()
+  xp: number;
+
+  @Expose()
+  rank: number;
+
+  @Expose()
+  streak: number;
+
+  @Expose()
+  avatar: string;
+}
