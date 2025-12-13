@@ -37,35 +37,35 @@ jobs:
         with:
           switches: -zr --delete
           path: dist/
-          remote_path: ${{ inputs.project_path }}/dist/
-          remote_host: ${{ inputs.server_ip }}
-          remote_port: ${{ inputs.ssh_port }}
-          remote_user: ${{ inputs.server_user }}
-          remote_key: ${{ secrets.ssh_private_key }}
+          remote_path: ${{ vars.PROJECT_PATH }}/dist/
+          remote_host: ${{ secrets.SERVER_IP }}
+          remote_port: ${{ secrets.SSH_PORT }}
+          remote_user: ${{ secrets.SERVER_USER }}
+          remote_key: ${{ secrets.SSH_KEY }}
 
       - name: Start application
         uses: appleboy/ssh-action@v1.2.0
         with:
-          host: ${{ inputs.server_ip }}
-          username: ${{ inputs.server_user }}
-          key: ${{ secrets.ssh_private_key }}
-          port: ${{ inputs.ssh_port }}
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
           script: |
             source ~/.nvm/nvm.sh
-            cd ${{ inputs.project_path }}
+            cd ${{ vars.PROJECT_PATH }}
             git reset --hard HEAD
             git pull
             npm install
 
             # Check if PM2 is already running the app
-            pm2 describe ${{ inputs.project_name }} > /dev/null 2>&1
+            pm2 describe ${{ vars.PROJECT_NAME }} > /dev/null 2>&1
             RUNNING=$?
 
             if [ "${RUNNING}" -ne 0 ]; then
                 # Start new
-              pm2 start dist/main.js --name ${{ inputs.project_name }} -i 1
+              pm2 start dist/main.js --name ${{ vars.PROJECT_NAME }} -i 1
             else
-              pm2 reload ${{ inputs.project_name }} --wait-ready --listen-timeout ${{ inputs.listen_timeout }} --update-env
+              pm2 reload ${{ vars.PROJECT_NAME }} --wait-ready --listen-timeout 300 --update-env
             fi
 
       - name: Cleanup
