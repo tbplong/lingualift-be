@@ -6,7 +6,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { UserCollectionName } from 'src/constants/schema';
 import { UserDocument } from '../schema/user.schema';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import bcrypt from 'bcrypt';
 import { SALT_ROUNDS, PASSWORD_REGEX } from 'src/auth/constants';
 import { CreateUserDto } from '../dtos/users.dto';
@@ -38,8 +38,10 @@ export class UsersService {
     return await this.userModel.findOne({ email });
   }
 
-  public async findById(userId: Types.ObjectId): Promise<UserDocument> {
+  public async findById(userId: string): Promise<UserDocument> {
+    // Mongoose tự động hiểu userId là string và tìm đúng _id
     const user = await this.userModel.findById(userId);
+
     if (!user) {
       throw new NotFoundException('Người dùng không tồn tại');
     }

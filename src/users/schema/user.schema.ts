@@ -52,6 +52,18 @@ export class User {
 
   @Prop()
   public address: string;
+
+  @Prop({ default: 'A1' })
+  level: string;
+
+  @Prop({ default: 0 })
+  xp: number;
+
+  @Prop({ default: 0 })
+  rank: number;
+
+  @Prop({ default: 0 })
+  streak: number;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
