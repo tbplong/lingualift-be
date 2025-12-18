@@ -47,7 +47,9 @@ export class QuizController {
     @Param('id') id: Types.ObjectId,
   ): Promise<QuizResponseDto> {
     const quiz = await this.quizService.readQuizById(id);
-    return plainToInstance(QuizResponseDto, { quiz });
+    return plainToInstance(QuizResponseDto, quiz, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Get('/')

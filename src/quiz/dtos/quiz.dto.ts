@@ -88,14 +88,33 @@ export class CreateQuizResponseDto {
 
 export class QuizsResponseDto {
   @Expose()
-  @Type(() => QuizDto)
-  quizs: QuizDto[];
+  @Type(() => QuizMetadata)
+  quizs: QuizMetadata[];
+}
+
+class QuizMetadata extends QuizDto {
+  @Exclude()
+  declare questions: QuestionDto[];
 }
 
 export class QuizResponseDto {
+  // @Type(() => QuizDto)
+  // quiz: QuizDto;
+
   @Expose()
-  @Type(() => QuizDto)
-  quiz: QuizDto;
+  _id: Types.ObjectId;
+
+  @Expose()
+  title: string;
+
+  @Expose()
+  time: number; // 50 (seconds)
+
+  @Expose()
+  questionsNo: number; // total number of questions
+
+  @Expose()
+  questions: QuestionDto[];
 }
 
 export class UpdateQuizDto extends QuizDto {
