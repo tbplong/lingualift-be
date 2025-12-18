@@ -23,7 +23,6 @@ export declare global {
     interface Request {
       // customProps of pino-http
       customProps: object;
-      user: User;
     }
 
     interface User {

@@ -25,11 +25,10 @@ export class AuthGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    if (this.getPublic(context)) {
+      return true;
+    }
     try {
-      if (this.getPublic(context)) {
-        return true;
-      }
-
       const request: Request = context.switchToHttp().getRequest();
       const { token } = this.extractCredentialFromHeader(request);
       const { tokenId } = this.tokenService.readAccessToken(token);
@@ -40,6 +39,11 @@ export class AuthGuard implements CanActivate {
       if (!user) {
         throw new UnauthorizedException(
           'Không tìm thấy người dùng với mã đăng nhập',
+        );
+      }
+      if (user.isBanned) {
+        throw new ForbiddenException(
+          'Tài khoản của bạn hiện đang bị khóa. Vui lòng liên hệ với bộ phận Chăm sóc Khách hàng để được hỗ trợ thêm thông tin.',
         );
       }
 
@@ -56,29 +60,24 @@ export class AuthGuard implements CanActivate {
         email: user.email,
         userId: user._id,
       };
-
-      return true;
     } catch {
-      // --- SỬA LỖI TẠI ĐÂY ---
-      throw new UnauthorizedException('Failed');
+      const shouldBlock = this.getShouldBlockIfNotManager(context);
+      if (shouldBlock) {
+        throw new ForbiddenException();
+      }
     }
+    return true;
   }
 
   private extractCredentialFromHeader(request: Request): {
     token: string;
-    fingerprint: string;
   } {
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    const fingerprint = request.headers['fingerprint']?.toString();
     if (type !== 'Bearer') {
       throw new UnauthorizedException('Xác thực thất bại, chưa đăng nhập');
     }
-    if (!fingerprint) {
-      throw new UnauthorizedException('Xác thực thất bại, fingerprint');
-    }
     return {
       token,
-      fingerprint,
     };
   }
 

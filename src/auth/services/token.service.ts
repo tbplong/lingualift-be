@@ -189,7 +189,7 @@ export class TokenService {
     projection: ProjectionType<Token> = {},
     options: QueryOptions<Token> = {},
   ): Promise<TokenDocument | null> {
-    return this.tokenModel.findOne(query, projection, options);
+    return await this.tokenModel.findOne(query, projection, options);
   }
 
   private async findById(
