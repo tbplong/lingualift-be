@@ -6,7 +6,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { UserCollectionName } from 'src/constants/schema';
 import { UserDocument } from '../schema/user.schema';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import bcrypt from 'bcrypt';
 import { SALT_ROUNDS, PASSWORD_REGEX } from 'src/auth/constants';
 import { CreateUserDto } from '../dtos/users.dto';
@@ -21,16 +21,7 @@ export class UsersService {
   ) {}
 
   public async create(createUserDto: CreateUserDto): Promise<UserDocument> {
-    // if (createUserDto.password) {
-    //   const password = await this.checkAndHashPassword(createUserDto.password);
-    //   if (!password) {
-    //     throw new BadRequestException('Mật khẩu không hợp lệ');
-    //   }
-    //   createUserDto.password = password;
-    // }
-
     const newUser = await this.userModel.create(createUserDto);
-
     return newUser;
   }
 
@@ -67,23 +58,11 @@ export class UsersService {
   private testPasswordValidity(password: string): boolean {
     return PASSWORD_REGEX.test(password);
   }
-  public async usersProfile(authorization: string): Promise<UserDocument> {
-    const token = authorization?.replace(/^Bearer\s/, '');
-    if (!token) {
-      throw new Error('Authorization token missing');
-    }
-    const tokenId = this.tokenService.readAccessToken(token);
-    const tokenValid = await this.tokenService.verifyTokenValidity(
-      tokenId.tokenId,
-    );
-    if (!tokenValid) {
-      throw new Error('Token is invalid or expired');
-    }
-    const user = await this.tokenService.getUserByTokenId(tokenId.tokenId);
+  public async getUsersProfile(userId: Types.ObjectId): Promise<UserDocument> {
+    const user = await this.userModel.findById(userId);
     if (!user) {
       throw new Error('User not found for the provided token');
     }
-    // const user = await this.userService.usersProfile(authorization);
     return user;
   }
 }
