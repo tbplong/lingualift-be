@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 import { ConfigModule, ConfigType } from '@nestjs/config';
 import { authConfig } from './common/config';
 import { databaseConfig } from './common/config/database.config';
@@ -34,6 +35,7 @@ import { LoggerModule } from 'nestjs-pino';
     }),
     AuthModule,
     UsersModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [

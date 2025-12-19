@@ -1,0 +1,12 @@
+node_modules
+dist
+coverage
+.husky
+.git
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+*.log
+*.sqlite
+node_modules/
+build/
