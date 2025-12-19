@@ -17,9 +17,7 @@ import { OAuth2Client } from 'google-auth-library';
 @Global()
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      { name: TokenCollectionName, schema: TokenSchema },
-    ]),
+    MongooseModule.forFeature([{ name: TokenCollectionName, schema: TokenSchema }]),
     forwardRef(() => UsersModule),
     JwtModule.registerAsync({
       useFactory: (appAuthConfig: ConfigType<AuthConfigType>) => ({
@@ -36,10 +34,7 @@ import { OAuth2Client } from 'google-auth-library';
       provide: OAuth2Client,
       inject: [authConfig.KEY],
       useFactory: (appAuthConfig: ConfigType<AuthConfigType>): OAuth2Client =>
-        new OAuth2Client(
-          appAuthConfig.googleClientId,
-          appAuthConfig.googleClientSecret,
-        ),
+        new OAuth2Client(appAuthConfig.googleClientId, appAuthConfig.googleClientSecret),
     },
   ],
   controllers: [AuthController, GoogleAuthController],

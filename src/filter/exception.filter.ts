@@ -6,10 +6,7 @@ import { Response } from 'express';
 export class AllExceptionFilter implements common.ExceptionFilter {
   constructor(private logger: common.LoggerService) {}
 
-  private static handleResponse(
-    response: Response,
-    exception: common.HttpException | Error,
-  ): void {
+  private static handleResponse(response: Response, exception: common.HttpException | Error): void {
     let responseBody: any = { message: 'Internal server error' };
     let statusCode = common.HttpStatus.INTERNAL_SERVER_ERROR;
 
@@ -29,10 +26,7 @@ export class AllExceptionFilter implements common.ExceptionFilter {
     response.status(statusCode).json(responseBody);
   }
 
-  public catch(
-    exception: common.HttpException | Error,
-    host: common.ArgumentsHost,
-  ): void {
+  public catch(exception: common.HttpException | Error, host: common.ArgumentsHost): void {
     const ctx: HttpArgumentsHost = host.switchToHttp();
     const response: Response = ctx.getResponse();
 

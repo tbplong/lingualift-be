@@ -1,20 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import {
-  Inject,
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import dayjs from 'dayjs';
-import {
-  FilterQuery,
-  Model,
-  ProjectionType,
-  QueryOptions,
-  Types,
-} from 'mongoose';
+import { FilterQuery, Model, ProjectionType, QueryOptions, Types } from 'mongoose';
 import { authConfig, AuthConfigType } from 'src/common/config';
 
 import {
@@ -51,9 +40,7 @@ export class TokenService {
    * @param userId User ID that the token belongs to
    * @returns Created token
    */
-  public async create(
-    tokenInfo: TokenInfoInterface,
-  ): Promise<CreateTokenResponseInterface> {
+  public async create(tokenInfo: TokenInfoInterface): Promise<CreateTokenResponseInterface> {
     const { userId } = tokenInfo;
     const token = await this.tokenModel.create({
       userId,
@@ -68,9 +55,7 @@ export class TokenService {
    * @param tokenId Token ID to get the user
    * @returns The user that the token belongs to
    */
-  public async getUserByTokenId(
-    tokenId: Types.ObjectId,
-  ): Promise<UserDocument | null> {
+  public async getUserByTokenId(tokenId: Types.ObjectId): Promise<UserDocument | null> {
     const token = await this.findById(tokenId);
 
     if (!token) {
@@ -86,9 +71,7 @@ export class TokenService {
    * @param tokenId The token ID to deactivate
    * @returns The deactivated token
    */
-  public async deactivateToken(
-    tokenId: Types.ObjectId,
-  ): Promise<TokenDocument> {
+  public async deactivateToken(tokenId: Types.ObjectId): Promise<TokenDocument> {
     const token = await this.findById(new Types.ObjectId(tokenId));
 
     if (!token) {
@@ -107,10 +90,7 @@ export class TokenService {
    * @returns The generated access token
    */
   public generateAccessToken(tokenId: Types.ObjectId): string {
-    return this.jwtService.sign(
-      { tokenId },
-      { secret: this.appAuthConfig.jwtSecret },
-    );
+    return this.jwtService.sign({ tokenId }, { secret: this.appAuthConfig.jwtSecret });
   }
 
   /**

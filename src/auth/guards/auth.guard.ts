@@ -38,9 +38,7 @@ export class AuthGuard implements CanActivate {
 
       const user = await this.tokenService.getUserByTokenId(tokenId);
       if (!user) {
-        throw new UnauthorizedException(
-          'Không tìm thấy người dùng với mã đăng nhập',
-        );
+        throw new UnauthorizedException('Không tìm thấy người dùng với mã đăng nhập');
       }
 
       const shouldBlockIfNotManager = this.getShouldBlockByDecoratorKey(
@@ -64,9 +62,7 @@ export class AuthGuard implements CanActivate {
 
       shouldBlock = this.getPublic(context);
       if (shouldBlock) {
-        throw new UnauthorizedException(
-          'Xác thực thất bại, lỗi không xác định',
-        );
+        throw new UnauthorizedException('Xác thực thất bại, lỗi không xác định');
       }
     }
 
@@ -115,10 +111,7 @@ export class AuthGuard implements CanActivate {
     return shouldBlockMetadata;
   }
 
-  private getShouldBlockByDecoratorKey(
-    context: ExecutionContext,
-    decoratorKey: string,
-  ): boolean {
+  private getShouldBlockByDecoratorKey(context: ExecutionContext, decoratorKey: string): boolean {
     const shouldBlockMetadata: boolean | undefined = this.reflector.get(
       decoratorKey,
       context.getHandler(),

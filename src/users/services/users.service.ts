@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserCollectionName } from 'src/constants/schema';
 import { UserDocument } from '../schema/user.schema';
@@ -55,10 +51,7 @@ export class UsersService {
     return bcrypt.hash(password, salt);
   }
 
-  public async comparePassword(
-    password: string,
-    hashedPassword: string,
-  ): Promise<boolean> {
+  public async comparePassword(password: string, hashedPassword: string): Promise<boolean> {
     return bcrypt.compare(password, hashedPassword);
   }
 
@@ -71,9 +64,7 @@ export class UsersService {
       throw new Error('Authorization token missing');
     }
     const tokenId = this.tokenService.readAccessToken(token);
-    const tokenValid = await this.tokenService.verifyTokenValidity(
-      tokenId.tokenId,
-    );
+    const tokenValid = await this.tokenService.verifyTokenValidity(tokenId.tokenId);
     if (!tokenValid) {
       throw new Error('Token is invalid or expired');
     }

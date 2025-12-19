@@ -1,11 +1,16 @@
 import { BadRequestException, Injectable, PipeTransform } from '@nestjs/common';
 
 @Injectable()
-export class RequiredUserIdPipe implements PipeTransform<string, string> {
-  transform(value: string): string {
-    if (!value) {
+export class RequiredUserIdPipe implements PipeTransform<any, string> {
+  transform(value: any): string {
+    if (value === null || value === undefined) {
       throw new BadRequestException('Missing userId in request');
     }
-    return value;
+
+    if (typeof value === 'string' && value.trim().length === 0) {
+      throw new BadRequestException('Missing userId in request');
+    }
+
+    return String(value);
   }
 }

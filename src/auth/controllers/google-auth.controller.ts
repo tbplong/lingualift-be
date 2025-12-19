@@ -16,10 +16,7 @@ export class GoogleAuthController {
     loginRequest: GoogleLoginRequestDto,
   ): Promise<GoogleLoginResponseDto> {
     const loginRequestInfo = { ...loginRequest };
-    const loginToken =
-      await this.googleAuthService.generateLoginTokenFromIdToken(
-        loginRequestInfo,
-      );
+    const loginToken = await this.googleAuthService.generateLoginTokenFromIdToken(loginRequestInfo);
     return plainToInstance(GoogleLoginResponseDto, loginToken, {
       excludeExtraneousValues: true,
     });

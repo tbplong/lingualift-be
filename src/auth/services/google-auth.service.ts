@@ -107,9 +107,7 @@ export class GoogleAuthService {
    * @param idToken ID token obtained from Google Sign-In fl??
    * @returns Login ticket of Google Sign-In flow.
    */
-  private async getLoginTicketFromIdToken(
-    idToken: string,
-  ): Promise<LoginTicket> {
+  private async getLoginTicketFromIdToken(idToken: string): Promise<LoginTicket> {
     return this.googleOauth2Client.verifyIdToken({
       idToken,
       audience: this.appAuthConfig.googleClientId,

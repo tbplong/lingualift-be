@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { LoginRequestDto, SignupRequestDto } from '../dtos';
@@ -35,9 +31,7 @@ export class AuthService {
     return accessToken;
   }
 
-  public async signUp(
-    signupRequestDto: SignupRequestDto,
-  ): Promise<{ access_token: string }> {
+  public async signUp(signupRequestDto: SignupRequestDto): Promise<{ access_token: string }> {
     const { email, password } = signupRequestDto;
     const user = await this.usersService.findOne(email);
     if (user) {

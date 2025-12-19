@@ -14,28 +14,16 @@ export class AuthController {
 
   @Post('/login')
   @Public()
-  public async login(
-    @Body() loginRequestDto: LoginRequestDto,
-  ): Promise<AuthResponseDto> {
+  public async login(@Body() loginRequestDto: LoginRequestDto): Promise<AuthResponseDto> {
     const accessToken = await this.authService.logIn(loginRequestDto);
-    return plainToInstance(
-      AuthResponseDto,
-      { accessToken },
-      { excludeExtraneousValues: true },
-    );
+    return plainToInstance(AuthResponseDto, { accessToken }, { excludeExtraneousValues: true });
   }
 
   @Post('/signup')
   @Public()
-  public async signup(
-    @Body() signupRequestDto: SignupRequestDto,
-  ): Promise<AuthResponseDto> {
+  public async signup(@Body() signupRequestDto: SignupRequestDto): Promise<AuthResponseDto> {
     const accessToken = await this.authService.signUp(signupRequestDto);
-    return plainToInstance(
-      AuthResponseDto,
-      { accessToken },
-      { excludeExtraneousValues: true },
-    );
+    return plainToInstance(AuthResponseDto, { accessToken }, { excludeExtraneousValues: true });
   }
 
   @Delete('/logout')
