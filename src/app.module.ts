@@ -12,6 +12,7 @@ import { ExceptionsFilter } from './common/filters';
 import { AuthGuard } from './auth/guards';
 import { LoggerModule } from 'nestjs-pino';
 import { QuizModule } from './quiz/quiz.module';
+import { AttemptModule } from './attempt/attempt.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { QuizModule } from './quiz/quiz.module';
     AuthModule,
     UsersModule,
     QuizModule,
+    AttemptModule,
   ],
   controllers: [AppController],
   providers: [
