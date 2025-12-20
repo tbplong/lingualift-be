@@ -22,6 +22,12 @@ export class CreateUserDto {
   public password: string | null;
 }
 
+class SocialMediaResponse {
+  facebookUrl?: string;
+
+  facebookName?: string;
+}
+
 export class UserResponseDto {
   public _id: string;
   public email: string;
@@ -33,6 +39,9 @@ export class UserResponseDto {
   public phone: string | null;
   public createdAt: Date;
   public updatedAt: Date;
+  public address: string | undefined;
+  public highSchool: string | undefined;
+  public socialMedia: SocialMediaResponse | undefined;
 
   constructor(user: UserDocument) {
     this._id = user._id.toString();
@@ -43,6 +52,9 @@ export class UserResponseDto {
     this.picture = user.picture;
     this.dateOfBirth = user.dateOfBirth;
     this.phone = user.phone;
+    this.highSchool = user?.highSchool;
+    this.address = user?.address;
+    this.socialMedia = user?.socialMedia;
   }
 }
 export class SocialMedia {

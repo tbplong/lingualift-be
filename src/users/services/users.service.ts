@@ -72,39 +72,41 @@ export class UsersService {
     changedInformation: ChangedInformation,
   ): Promise<UserDocument> {
     const user = await this.userModel.findById(userId);
+
     if (!user) {
       throw new NotFoundException('User not found ');
     }
+
     const { firstName, lastName, email, highSchool, address, socialMedia } =
       changedInformation;
 
-    if (firstName && user?.firstName !== firstName) {
+    if (firstName) {
       user.firstName = firstName;
     }
 
-    if (lastName && user?.lastName !== lastName) {
+    if (lastName) {
       user.lastName = lastName;
     }
 
-    if (email && user?.email !== email) {
+    if (email) {
       user.email = email;
     }
 
-    if (highSchool && user?.highSchool !== highSchool) {
+    if (highSchool) {
       user.highSchool = highSchool;
     }
 
-    if (address && user?.address !== address) {
+    if (address) {
       user.address = address;
     }
 
-    if (socialMedia && socialMedia.facebookName) {
-      user.socialMedia.facebookName = socialMedia.facebookName;
+    if (socialMedia) {
+      user.socialMedia = {
+        facebookName: socialMedia.facebookName,
+        facebookUrl: socialMedia.facebookUrl,
+      };
     }
 
-    if (socialMedia && socialMedia.facebookUrl) {
-      user.socialMedia.facebookUrl = socialMedia.facebookUrl;
-    }
     await user.save();
 
     return user;
