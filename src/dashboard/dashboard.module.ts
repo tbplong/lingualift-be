@@ -5,14 +5,13 @@ import { DashboardService } from './dashboard.service';
 
 import { QuizAttempt, QuizAttemptSchema } from '../quiz-attempts/schemas/quiz-attempt.schema';
 
-// ✅ IMPORT ĐÚNG TỪ FILE BẠN VỪA GỬI
 import { Token, TokenSchema } from '../auth/schemas/token.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: QuizAttempt.name, schema: QuizAttemptSchema },
-      { name: Token.name, schema: TokenSchema }, // ✅ hết lỗi TS2304
+      { name: Token.name, schema: TokenSchema },
     ]),
   ],
   controllers: [DashboardController],

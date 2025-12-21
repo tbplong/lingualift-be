@@ -3,19 +3,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { QuizAttempt, QuizAttemptDocument } from '../quiz-attempts/schemas/quiz-attempt.schema';
 
-// ✅ chỉnh path này cho đúng dự án bạn
 import { Token, TokenDocument } from 'src/auth/schemas/token.schema';
 
-/**
- * Get Monday 00:00:00 of current week
- */
 function getStartOfWeekMonday(date: Date = new Date()): Date {
   const d = new Date(date);
 
-  // keep your original logic
   d.setHours(d.getHours() + 7);
 
-  const day = d.getDay(); // 0 = Sunday
+  const day = d.getDay();
   const diff = day === 0 ? -6 : 1 - day;
 
   d.setDate(d.getDate() + diff);
@@ -24,9 +19,6 @@ function getStartOfWeekMonday(date: Date = new Date()): Date {
   return d;
 }
 
-/**
- * Get next Monday 00:00:00 (exclusive end)
- */
 function getEndOfWeekExclusive(date: Date = new Date()): Date {
   const start = getStartOfWeekMonday(date);
   const end = new Date(start);
@@ -46,7 +38,6 @@ export class DashboardService {
     private readonly tokenModel: Model<TokenDocument>,
   ) {}
 
-  // ✅ map tokenId -> userId (lấy userId từ DB tokens)
   private async resolveUserIdFromTokenId(tokenId: string): Promise<string> {
     if (!tokenId || (typeof tokenId === 'string' && tokenId.trim().length === 0)) {
       throw new UnauthorizedException('Missing tokenId in request');
@@ -57,23 +48,19 @@ export class DashboardService {
       throw new UnauthorizedException('Invalid token');
     }
 
-    // tokenDoc.userId là ObjectId
     return String(tokenDoc.userId);
   }
 
-  // ✅ API mới: gọi bằng tokenId
   async getSummaryByTokenId(tokenId: string) {
     const userId = await this.resolveUserIdFromTokenId(tokenId);
     return this.getSummary(userId);
   }
 
-  // ✅ API mới: gọi bằng tokenId
   async getWeeklyByTokenId(tokenId: string) {
     const userId = await this.resolveUserIdFromTokenId(tokenId);
     return this.getWeekly(userId);
   }
 
-  // ====== Logic cũ giữ nguyên ======
   async getSummary(userId: string) {
     const objectUserId = new Types.ObjectId(userId);
 
@@ -92,7 +79,6 @@ export class DashboardService {
       },
       {
         $facet: {
-          /** ⏱ Time spent THIS WEEK */
           timeThisWeek: [
             {
               $match: {
@@ -110,7 +96,6 @@ export class DashboardService {
             },
           ],
 
-          /** ✅ Completed quizzes (ALL TIME) */
           completedAllTime: [
             {
               $match: {
@@ -125,7 +110,6 @@ export class DashboardService {
             },
           ],
 
-          /** 🎯 Accuracy (ALL TIME, finished only) */
           accuracyAllTime: [
             {
               $match: {
@@ -200,21 +184,18 @@ export class DashboardService {
         $group: {
           _id: '$day',
 
-          /** ⏱ Total time per day (minutes) */
           minutes: {
             $sum: {
               $divide: ['$durationSec', 60],
             },
           },
 
-          /** ✅ Completed quizzes per day */
           completed: {
             $sum: {
               $cond: [{ $eq: ['$status', 'finished'] }, 1, 0],
             },
           },
 
-          /** 🎯 Accuracy per day (finished only) */
           accuracy: {
             $avg: {
               $cond: [{ $eq: ['$status', 'finished'] }, '$scorePercent', null],

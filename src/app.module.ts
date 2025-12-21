@@ -5,20 +5,22 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { ConfigModule, ConfigType } from '@nestjs/config';
-import { authConfig } from './common/config';
+import { authConfig, commonConfig, minioConfig } from './common/config';
 import { databaseConfig } from './common/config/database.config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { ExceptionsFilter } from './common/filters';
 import { AuthGuard } from './auth/guards';
 import { LoggerModule } from 'nestjs-pino';
+import { StorageModule } from './storage/storage.module';
+import { NationalExamModule } from './national-exam/national-exam.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       cache: true,
-      load: [authConfig, databaseConfig],
+      load: [authConfig, databaseConfig, minioConfig, commonConfig],
     }),
     MongooseModule.forRootAsync({
       useFactory: (dbConfig: ConfigType<typeof databaseConfig>) => ({
@@ -36,6 +38,8 @@ import { LoggerModule } from 'nestjs-pino';
     AuthModule,
     UsersModule,
     DashboardModule,
+    StorageModule,
+    NationalExamModule,
   ],
   controllers: [AppController],
   providers: [

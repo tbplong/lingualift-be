@@ -7,6 +7,7 @@ import bcrypt from 'bcrypt';
 import { SALT_ROUNDS, PASSWORD_REGEX } from 'src/auth/constants';
 import { CreateUserDto } from '../dtos/users.dto';
 import { TokenService } from 'src/auth/services/token.service';
+import { ChangedInformation } from '../interface';
 
 @Injectable()
 export class UsersService {
@@ -17,16 +18,7 @@ export class UsersService {
   ) {}
 
   public async create(createUserDto: CreateUserDto): Promise<UserDocument> {
-    // if (createUserDto.password) {
-    //   const password = await this.checkAndHashPassword(createUserDto.password);
-    //   if (!password) {
-    //     throw new BadRequestException('Mật khẩu không hợp lệ');
-    //   }
-    //   createUserDto.password = password;
-    // }
-
     const newUser = await this.userModel.create(createUserDto);
-
     return newUser;
   }
 
@@ -34,8 +26,10 @@ export class UsersService {
     return await this.userModel.findOne({ email });
   }
 
-  public async findById(userId: Types.ObjectId): Promise<UserDocument> {
+  public async findById(userId: string): Promise<UserDocument> {
+    // Mongoose tự động hiểu userId là string và tìm đúng _id
     const user = await this.userModel.findById(userId);
+
     if (!user) {
       throw new NotFoundException('Người dùng không tồn tại');
     }
@@ -58,21 +52,55 @@ export class UsersService {
   private testPasswordValidity(password: string): boolean {
     return PASSWORD_REGEX.test(password);
   }
-  public async usersProfile(authorization: string): Promise<UserDocument> {
-    const token = authorization?.replace(/^Bearer\s/, '');
-    if (!token) {
-      throw new Error('Authorization token missing');
-    }
-    const tokenId = this.tokenService.readAccessToken(token);
-    const tokenValid = await this.tokenService.verifyTokenValidity(tokenId.tokenId);
-    if (!tokenValid) {
-      throw new Error('Token is invalid or expired');
-    }
-    const user = await this.tokenService.getUserByTokenId(tokenId.tokenId);
+  public async getUsersProfile(userId: Types.ObjectId): Promise<UserDocument> {
+    const user = await this.userModel.findById(userId);
     if (!user) {
       throw new Error('User not found for the provided token');
     }
-    // const user = await this.userService.usersProfile(authorization);
+    return user;
+  }
+
+  public async editUserProfile(
+    userId: Types.ObjectId,
+    changedInformation: ChangedInformation,
+  ): Promise<UserDocument> {
+    const user = await this.userModel.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found ');
+    }
+
+    const { firstName, lastName, email, highSchool, address, socialMedia } = changedInformation;
+
+    if (firstName) {
+      user.firstName = firstName;
+    }
+
+    if (lastName) {
+      user.lastName = lastName;
+    }
+
+    if (email) {
+      user.email = email;
+    }
+
+    if (highSchool) {
+      user.highSchool = highSchool;
+    }
+
+    if (address) {
+      user.address = address;
+    }
+
+    if (socialMedia) {
+      user.socialMedia = {
+        facebookName: socialMedia.facebookName,
+        facebookUrl: socialMedia.facebookUrl,
+      };
+    }
+
+    await user.save();
+
     return user;
   }
 }

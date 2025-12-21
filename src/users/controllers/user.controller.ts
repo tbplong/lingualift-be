@@ -1,18 +1,26 @@
-import { Controller, Get, Headers } from '@nestjs/common';
+import { Body, Controller, Get, Headers, Patch } from '@nestjs/common';
 import { UsersService } from '../services';
-import { TokenService } from 'src/auth/services';
-import { UserResponseDto } from '../dtos/users.dto';
+import { EditProfileRequestDto, UserResponseDto } from '../dtos/users.dto';
+import { User } from 'src/auth/decorators';
 
 @Controller('users')
 export class UsersController {
-  constructor(
-    private userService: UsersService,
-    private tokenService: TokenService,
-  ) {}
+  constructor(private userService: UsersService) {}
 
   @Get('/profile')
-  public async getProfile(@Headers('authorization') authorization: string) {
-    const user = await this.userService.usersProfile(authorization);
-    return new UserResponseDto(user);
+  public async getProfile(@User() user: Express.User) {
+    console.log(user);
+    const data = await this.userService.getUsersProfile(user.userId);
+    return new UserResponseDto(data);
+  }
+
+  @Patch('/profile')
+  public async editProfile(
+    @User() user: Express.User,
+    @Body() changedInformation: EditProfileRequestDto,
+  ) {
+    const data = await this.userService.editUserProfile(user.userId, changedInformation);
+
+    return new UserResponseDto(data);
   }
 }

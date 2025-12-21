@@ -25,11 +25,10 @@ export class AuthGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    if (this.getPublic(context)) {
+      return true;
+    }
     try {
-      if (this.getPublic(context)) {
-        return true;
-      }
-
       const request: Request = context.switchToHttp().getRequest();
       const { token } = this.extractCredentialFromHeader(request);
       const { tokenId } = this.tokenService.readAccessToken(token);
@@ -39,6 +38,11 @@ export class AuthGuard implements CanActivate {
       const user = await this.tokenService.getUserByTokenId(tokenId);
       if (!user) {
         throw new UnauthorizedException('Không tìm thấy người dùng với mã đăng nhập');
+      }
+      if (user.isBanned) {
+        throw new ForbiddenException(
+          'Tài khoản của bạn hiện đang bị khóa. Vui lòng liên hệ với bộ phận Chăm sóc Khách hàng để được hỗ trợ thêm thông tin.',
+        );
       }
 
       const shouldBlockIfNotManager = this.getShouldBlockByDecoratorKey(
@@ -55,35 +59,23 @@ export class AuthGuard implements CanActivate {
         userId: user._id,
       };
     } catch {
-      let shouldBlock = this.getShouldBlockIfNotManager(context);
+      const shouldBlock = this.getShouldBlockIfNotManager(context);
       if (shouldBlock) {
         throw new ForbiddenException();
       }
-
-      shouldBlock = this.getPublic(context);
-      if (shouldBlock) {
-        throw new UnauthorizedException('Xác thực thất bại, lỗi không xác định');
-      }
     }
-
     return true;
   }
 
   private extractCredentialFromHeader(request: Request): {
     token: string;
-    fingerprint: string;
   } {
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    const fingerprint = request.headers['fingerprint']?.toString();
     if (type !== 'Bearer') {
       throw new UnauthorizedException('Xác thực thất bại, chưa đăng nhập');
     }
-    if (!fingerprint) {
-      throw new UnauthorizedException('Xác thực thất bại, fingerprint');
-    }
     return {
       token,
-      fingerprint,
     };
   }
 

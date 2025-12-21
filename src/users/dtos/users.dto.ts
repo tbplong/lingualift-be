@@ -1,4 +1,6 @@
+import { IsOptional, IsString, IsUrl, ValidateNested } from 'class-validator';
 import { UserDocument } from '../schema';
+import { Type } from 'class-transformer';
 
 export class CreateUserDto {
   public readonly email: string;
@@ -20,6 +22,12 @@ export class CreateUserDto {
   public password: string | null;
 }
 
+class SocialMediaResponse {
+  facebookUrl?: string;
+
+  facebookName?: string;
+}
+
 export class UserResponseDto {
   public _id: string;
   public email: string;
@@ -31,6 +39,9 @@ export class UserResponseDto {
   public phone: string | null;
   public createdAt: Date;
   public updatedAt: Date;
+  public address: string | undefined;
+  public highSchool: string | undefined;
+  public socialMedia: SocialMediaResponse | undefined;
 
   constructor(user: UserDocument) {
     this._id = user._id.toString();
@@ -41,5 +52,46 @@ export class UserResponseDto {
     this.picture = user.picture;
     this.dateOfBirth = user.dateOfBirth;
     this.phone = user.phone;
+    this.highSchool = user?.highSchool;
+    this.address = user?.address;
+    this.socialMedia = user?.socialMedia;
   }
+}
+export class SocialMedia {
+  @IsUrl()
+  @IsOptional()
+  facebookUrl?: string;
+
+  @IsString()
+  @IsOptional()
+  facebookName?: string;
+}
+export class EditProfileRequestDto {
+  @IsString()
+  @IsOptional()
+  firstName?: string;
+
+  @IsString()
+  @IsOptional()
+  lastName?: string;
+
+  @IsString()
+  @IsOptional()
+  email?: string;
+
+  @IsString()
+  @IsOptional()
+  highSchool?: string;
+
+  @IsString()
+  @IsOptional()
+  address?: string;
+
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => SocialMedia)
+  socialMedia?: {
+    facebookUrl?: string;
+    facebookName?: string;
+  };
 }

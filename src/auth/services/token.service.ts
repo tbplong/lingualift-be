@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Inject, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
@@ -62,7 +61,7 @@ export class TokenService {
       throw new NotFoundException('Mã đăng nhập không tồn tại');
     }
 
-    return this.userService.findById(token.userId);
+    return this.userService.findById(token.userId.toString());
   }
 
   /**
@@ -169,7 +168,7 @@ export class TokenService {
     projection: ProjectionType<Token> = {},
     options: QueryOptions<Token> = {},
   ): Promise<TokenDocument | null> {
-    return this.tokenModel.findOne(query, projection, options);
+    return await this.tokenModel.findOne(query, projection, options);
   }
 
   private async findById(
