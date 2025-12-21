@@ -1,7 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { QuizAttempt, QuizAttemptDocument } from '../quiz-attempts/schemas/quiz-attempt.schema';
+
+// ✅ chỉnh path này cho đúng dự án bạn
+import { Token, TokenDocument } from 'src/auth/schemas/token.schema';
 
 /**
  * Get Monday 00:00:00 of current week
@@ -9,6 +12,7 @@ import { QuizAttempt, QuizAttemptDocument } from '../quiz-attempts/schemas/quiz-
 function getStartOfWeekMonday(date: Date = new Date()): Date {
   const d = new Date(date);
 
+  // keep your original logic
   d.setHours(d.getHours() + 7);
 
   const day = d.getDay(); // 0 = Sunday
@@ -37,8 +41,39 @@ export class DashboardService {
   constructor(
     @InjectModel(QuizAttempt.name)
     private readonly quizAttemptModel: Model<QuizAttemptDocument>,
+
+    @InjectModel(Token.name)
+    private readonly tokenModel: Model<TokenDocument>,
   ) {}
 
+  // ✅ map tokenId -> userId (lấy userId từ DB tokens)
+  private async resolveUserIdFromTokenId(tokenId: string): Promise<string> {
+    if (!tokenId || (typeof tokenId === 'string' && tokenId.trim().length === 0)) {
+      throw new UnauthorizedException('Missing tokenId in request');
+    }
+
+    const tokenDoc = await this.tokenModel.findById(tokenId).lean();
+    if (!tokenDoc) {
+      throw new UnauthorizedException('Invalid token');
+    }
+
+    // tokenDoc.userId là ObjectId
+    return String(tokenDoc.userId);
+  }
+
+  // ✅ API mới: gọi bằng tokenId
+  async getSummaryByTokenId(tokenId: string) {
+    const userId = await this.resolveUserIdFromTokenId(tokenId);
+    return this.getSummary(userId);
+  }
+
+  // ✅ API mới: gọi bằng tokenId
+  async getWeeklyByTokenId(tokenId: string) {
+    const userId = await this.resolveUserIdFromTokenId(tokenId);
+    return this.getWeekly(userId);
+  }
+
+  // ====== Logic cũ giữ nguyên ======
   async getSummary(userId: string) {
     const objectUserId = new Types.ObjectId(userId);
 
@@ -128,6 +163,7 @@ export class DashboardService {
       accuracyPercent: Math.round(result?.accuracy ?? 0),
     };
   }
+
   async getWeekly(userId: string) {
     const objectUserId = new Types.ObjectId(userId);
 
@@ -198,7 +234,6 @@ export class DashboardService {
       { $sort: { day: 1 } },
     ]);
 
-    /** Map results by day for easy fill */
     const map = new Map<string, { minutes: number; completed: number; accuracy: number }>();
 
     for (const r of rows) {
@@ -209,7 +244,6 @@ export class DashboardService {
       });
     }
 
-    /** Fill missing days (Mon → Sun) with 0 */
     const points = Array.from({ length: 7 }).map((_, i) => {
       const d = new Date(weekStart);
       d.setDate(weekStart.getDate() + i);

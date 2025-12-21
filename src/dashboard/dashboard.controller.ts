@@ -1,8 +1,9 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import type { Request } from 'express';
+
 import { DashboardService } from './dashboard.service';
 import { AuthGuard } from '../auth/guards';
-import { User } from 'src/auth/decorators';
-import { RequiredUserIdPipe } from '../auth/pipes/required-user-id.pipe';
+import type { AuthUserPayload } from '../auth/types/auth-request.type';
 
 @Controller('dashboard')
 export class DashboardController {
@@ -10,13 +11,15 @@ export class DashboardController {
 
   @UseGuards(AuthGuard)
   @Get('summary')
-  async getSummary(@User(RequiredUserIdPipe) userId: string) {
-    return this.dashboardService.getSummary(userId);
+  getSummary(@Req() req: Request & { user: AuthUserPayload }) {
+    const tokenId = req.user.tokenId;
+    return this.dashboardService.getSummaryByTokenId(tokenId);
   }
 
   @UseGuards(AuthGuard)
   @Get('weekly')
-  async getWeekly(@User(RequiredUserIdPipe) userId: string) {
-    return this.dashboardService.getWeekly(userId);
+  getWeekly(@Req() req: Request & { user: AuthUserPayload }) {
+    const tokenId = req.user.tokenId;
+    return this.dashboardService.getWeeklyByTokenId(tokenId);
   }
 }
