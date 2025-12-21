@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Query,
 } from '@nestjs/common';
@@ -14,6 +15,7 @@ import {
   AttemptsResponseDto,
   CreateAttemptDto,
   CreateAttemptResponseDto,
+  UpdateAttemptDto,
 } from '../dtos';
 import { User } from 'src/auth/decorators';
 import { Types } from 'mongoose';
@@ -22,6 +24,7 @@ import { Types } from 'mongoose';
 export class AttemptController {
   constructor(private attemptService: AttemptService) {}
 
+  // Create attempt
   @Post('/')
   public async create(
     @Body() createAttemptDto: CreateAttemptDto,
@@ -34,14 +37,35 @@ export class AttemptController {
     return plainToInstance(CreateAttemptResponseDto, { _id: newAttemptId });
   }
 
+  // Update attempt
+  @Patch('/:id')
+  public async update(
+    @Param('id') id: string,
+    @Body() updateAttemptDto: UpdateAttemptDto,
+    @User() user: { _id: Types.ObjectId },
+  ): Promise<AttemptDetailDto> {
+    const updatedAttempt = await this.attemptService.updateAttempt(
+      id,
+      updateAttemptDto,
+      user._id,
+    );
+    return plainToInstance(AttemptDetailDto, updatedAttempt, {
+      excludeExtraneousValues: true,
+    });
+  }
+
+  // Get attempts by quizId
   @Get('/')
   public async getByQuizId(
     @Query('quizId') quizId: string,
+    @Query('completedOnly') completedOnly: string,
     @User() user: { _id: Types.ObjectId },
   ): Promise<AttemptsResponseDto> {
+    const completed = completedOnly === 'true' ? true : undefined;
     const attempts = await this.attemptService.getAttemptsByQuizId(
       quizId,
       user._id,
+      completed,
     );
     return plainToInstance(
       AttemptsResponseDto,
@@ -50,6 +74,23 @@ export class AttemptController {
     );
   }
 
+  // Get in-progress attempt
+  @Get('/in-progress/:quizId')
+  public async getInProgress(
+    @Param('quizId') quizId: string,
+    @User() user: { _id: Types.ObjectId },
+  ): Promise<AttemptDetailDto | null> {
+    const attempt = await this.attemptService.getInProgressAttempt(
+      quizId,
+      user._id,
+    );
+    if (!attempt) return null;
+    return plainToInstance(AttemptDetailDto, attempt, {
+      excludeExtraneousValues: true,
+    });
+  }
+
+  // Get attempt by ID
   @Get('/:id')
   public async getById(
     @Param('id') id: string,
@@ -61,6 +102,7 @@ export class AttemptController {
     });
   }
 
+  // Delete attempt
   @Delete('/:id')
   public async deleteById(
     @Param('id') id: string,

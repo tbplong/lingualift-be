@@ -18,13 +18,19 @@ export class Attempt {
   @Prop({ required: true })
   public startTime: Date;
 
-  @Prop({ required: true })
+  @Prop({ default: null })
   public endTime: Date;
 
-  @Prop({ required: true })
-  public timeTaken: number; // in seconds
+  @Prop({ default: 0 })
+  public timeTaken: number;
 
-  @Prop({ required: true })
+  @Prop({ default: null })
+  public remainingTime: number;
+
+  @Prop({ default: false })
+  public isCompleted: boolean;
+
+  @Prop({ default: 0 })
   public score: number;
 
   @Prop({ required: true })
@@ -34,7 +40,7 @@ export class Attempt {
   public answers: UserAnswer[];
 
   @Prop({ default: [] })
-  public markedForReview: number[]; // question indices
+  public markedForReview: number[];
 
   @Prop()
   public createdAt: Date;
@@ -48,7 +54,7 @@ class UserAnswer {
   questionIndex: number;
 
   @Prop({ required: true })
-  selectedAnswer: number; // -1 if not answered
+  selectedAnswer: number;
 
   @Prop({ required: true })
   isCorrect: boolean;

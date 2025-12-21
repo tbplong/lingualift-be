@@ -11,7 +11,7 @@ import {
 import { Expose, Type } from 'class-transformer';
 import { Types } from 'mongoose';
 
-// Request DTO for creating an attempt
+// Request DTO for creating/saving an attempt (supports both in-progress and completed)
 export class CreateAttemptDto {
   @IsNotEmpty()
   @IsString()
@@ -25,17 +25,25 @@ export class CreateAttemptDto {
   @IsDateString()
   startTime: Date;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsDateString()
-  endTime: Date;
+  endTime?: Date; // Optional - null if in progress
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
-  timeTaken: number;
+  timeTaken?: number; // Time spent so far
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
-  score: number;
+  remainingTime?: number; // Time left on quiz (for resuming later)
+
+  @IsOptional()
+  @IsBoolean()
+  isCompleted?: boolean; // true when quiz is submitted
+
+  @IsOptional()
+  @IsNumber()
+  score?: number; // Only required when completed
 
   @IsNotEmpty()
   @IsNumber()
@@ -49,7 +57,40 @@ export class CreateAttemptDto {
 
   @IsOptional()
   @IsArray()
-  markedForReview: number[];
+  markedForReview?: number[];
+}
+
+// DTO for updating an in-progress attempt
+export class UpdateAttemptDto {
+  @IsOptional()
+  @IsDateString()
+  endTime?: Date;
+
+  @IsOptional()
+  @IsNumber()
+  timeTaken?: number;
+
+  @IsOptional()
+  @IsNumber()
+  remainingTime?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  isCompleted?: boolean;
+
+  @IsOptional()
+  @IsNumber()
+  score?: number;
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => UserAnswerDto)
+  answers?: UserAnswerDto[];
+
+  @IsOptional()
+  @IsArray()
+  markedForReview?: number[];
 }
 
 export class UserAnswerDto {
@@ -87,6 +128,12 @@ export class AttemptListItemDto {
   timeTaken: number;
 
   @Expose()
+  remainingTime: number;
+
+  @Expose()
+  isCompleted: boolean;
+
+  @Expose()
   score: number;
 
   @Expose()
@@ -99,14 +146,12 @@ export class AttemptListItemDto {
   createdAt: Date;
 }
 
-// Response DTO for attempts list
 export class AttemptsResponseDto {
   @Expose()
   @Type(() => AttemptListItemDto)
   attempts: AttemptListItemDto[];
 }
 
-// Response DTO for single attempt with answers
 export class AttemptDetailDto {
   @Expose()
   _id: Types.ObjectId;
@@ -127,6 +172,12 @@ export class AttemptDetailDto {
   timeTaken: number;
 
   @Expose()
+  remainingTime: number;
+
+  @Expose()
+  isCompleted: boolean;
+
+  @Expose()
   score: number;
 
   @Expose()
@@ -143,7 +194,6 @@ export class AttemptDetailDto {
   createdAt: Date;
 }
 
-// Response for create attempt
 export class CreateAttemptResponseDto {
   @Expose()
   _id: Types.ObjectId;

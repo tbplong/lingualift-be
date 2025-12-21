@@ -3,7 +3,7 @@ import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { AttemptCollectionName } from 'src/constants/schema';
 import { AttemptDocument } from '../schemas/attempt.schema';
-import { CreateAttemptDto } from '../dtos';
+import { CreateAttemptDto, UpdateAttemptDto } from '../dtos';
 
 @Injectable()
 export class AttemptService {
@@ -20,22 +20,66 @@ export class AttemptService {
       ...createAttemptDto,
       quizId: new Types.ObjectId(createAttemptDto.quizId),
       userId,
+      isCompleted: createAttemptDto.isCompleted ?? false,
+      remainingTime: createAttemptDto.remainingTime ?? null,
     });
     return newAttempt._id;
+  }
+
+  public async updateAttempt(
+    attemptId: string,
+    updateAttemptDto: UpdateAttemptDto,
+    userId: Types.ObjectId,
+  ): Promise<AttemptDocument> {
+    const updatedAttempt = await this.attemptModel
+      .findOneAndUpdate(
+        {
+          _id: new Types.ObjectId(attemptId),
+          userId,
+        },
+        { $set: updateAttemptDto },
+        { new: true },
+      )
+      .lean();
+    if (!updatedAttempt) {
+      throw new NotFoundException('Attempt not found');
+    }
+    return updatedAttempt;
   }
 
   public async getAttemptsByQuizId(
     quizId: string,
     userId: Types.ObjectId,
+    completedOnly?: boolean,
   ): Promise<AttemptDocument[]> {
+    const query: Record<string, unknown> = {
+      quizId: new Types.ObjectId(quizId),
+      userId,
+    };
+
+    if (completedOnly !== undefined) {
+      query.isCompleted = completedOnly;
+    }
+
     const attempts = await this.attemptModel
-      .find({
-        quizId: new Types.ObjectId(quizId),
-        userId,
-      })
+      .find(query)
       .sort({ createdAt: -1 })
       .lean();
     return attempts;
+  }
+
+  public async getInProgressAttempt(
+    quizId: string,
+    userId: Types.ObjectId,
+  ): Promise<AttemptDocument | null> {
+    const attempt = await this.attemptModel
+      .findOne({
+        quizId: new Types.ObjectId(quizId),
+        userId,
+        isCompleted: false,
+      })
+      .lean();
+    return attempt;
   }
 
   public async getAttemptById(
