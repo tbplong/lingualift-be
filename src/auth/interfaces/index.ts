@@ -43,4 +43,6 @@ export interface AuthenticateRequestInfoInterface {
 
 export interface TokenInfoInterface {
   userId: Types.ObjectId;
+  email: string;
+  isManager: boolean;
 }
