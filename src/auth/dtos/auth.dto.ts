@@ -60,17 +60,5 @@ export class ProfileResponseDto {
   lastName: string;
 
   @Expose()
-  level: string;
-
-  @Expose()
-  xp: number;
-
-  @Expose()
-  rank: number;
-
-  @Expose()
-  streak: number;
-
-  @Expose()
   avatar: string;
 }

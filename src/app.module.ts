@@ -14,7 +14,7 @@ import { AuthGuard } from './auth/guards';
 import { LoggerModule } from 'nestjs-pino';
 import { StorageModule } from './storage/storage.module';
 import { NationalExamModule } from './national-exam/national-exam.module';
-
+import { MaterialsModule } from './materials/materials.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -40,6 +40,7 @@ import { NationalExamModule } from './national-exam/national-exam.module';
     DashboardModule,
     StorageModule,
     NationalExamModule,
+    MaterialsModule,
   ],
   controllers: [AppController],
   providers: [
