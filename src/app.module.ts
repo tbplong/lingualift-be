@@ -4,7 +4,12 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ConfigModule, ConfigType } from '@nestjs/config';
-import { authConfig, commonConfig, minioConfig } from './common/config';
+import {
+  authConfig,
+  commonConfig,
+  minioConfig,
+  redisConfig,
+} from './common/config';
 import { databaseConfig } from './common/config/database.config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
@@ -13,13 +18,20 @@ import { AuthGuard } from './auth/guards';
 import { LoggerModule } from 'nestjs-pino';
 import { StorageModule } from './storage/storage.module';
 import { NationalExamModule } from './national-exam/national-exam.module';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       cache: true,
-      load: [authConfig, databaseConfig, minioConfig, commonConfig],
+      load: [
+        authConfig,
+        databaseConfig,
+        minioConfig,
+        commonConfig,
+        redisConfig,
+      ],
     }),
     MongooseModule.forRootAsync({
       useFactory: (dbConfig: ConfigType<typeof databaseConfig>) => ({
@@ -38,6 +50,7 @@ import { NationalExamModule } from './national-exam/national-exam.module';
     UsersModule,
     StorageModule,
     NationalExamModule,
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [

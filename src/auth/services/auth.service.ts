@@ -30,15 +30,17 @@ export class AuthService {
     }
     // const payload = { email: user.email, _id: user._id.toString() };
     // const accessToken = await this.jwtService.signAsync(payload);
-    const newToken = await this.tokenService.create({ userId: user._id });
+    const newToken = await this.tokenService.create({
+      userId: user._id,
+      email: user.email,
+      isManager: user.isManager,
+    });
     const payload = { tokenId: newToken.tokenId };
     const accessToken = await this.jwtService.signAsync(payload);
     return accessToken;
   }
 
-  public async signUp(
-    signupRequestDto: SignupRequestDto,
-  ): Promise<{ access_token: string }> {
+  public async signUp(signupRequestDto: SignupRequestDto): Promise<string> {
     const { email, password } = signupRequestDto;
     const user = await this.usersService.findOne(email);
     if (user) {
@@ -56,10 +58,14 @@ export class AuthService {
       phone: signupRequestDto.phone,
       password: hashedPassword,
     });
-    const payload = { email: newUser.email, _id: newUser._id.toString() };
-    return {
-      access_token: await this.jwtService.signAsync(payload),
-    };
+    const newToken = await this.tokenService.create({
+      userId: newUser._id,
+      email: newUser.email,
+      isManager: newUser.isManager,
+    });
+    const payload = { tokenId: newToken.tokenId };
+    const accessToken = await this.jwtService.signAsync(payload);
+    return accessToken;
   }
   // src/auth/services/auth.service.ts
 

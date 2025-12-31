@@ -28,6 +28,7 @@ import * as config from '@nestjs/config';
 import { UserDocument } from 'src/users/schema';
 import { UsersService } from 'src/users/services/users.service';
 import { forwardRef } from '@nestjs/common';
+import { CacheService, DEFAULT_CACHE_TTL } from 'src/redis/services';
 
 /**
  * Provides common methods for token management
@@ -42,6 +43,7 @@ export class TokenService {
     private jwtService: JwtService,
     @Inject(authConfig.KEY)
     private appAuthConfig: config.ConfigType<AuthConfigType>,
+    private cacheService: CacheService,
   ) {}
 
   /**
@@ -58,6 +60,11 @@ export class TokenService {
       userId,
       expiredAt: dayjs().add(365, 'day').toDate(),
     });
+    await this.cacheService.set(
+      token._id.toString(),
+      JSON.stringify(tokenInfo),
+      DEFAULT_CACHE_TTL,
+    );
     return { tokenId: token._id };
   }
 
@@ -180,6 +187,7 @@ export class TokenService {
 
     token.isActivate = false;
     await token.save();
+    await this.cacheService.revoke(token._id.toString());
     return token;
   }
 
