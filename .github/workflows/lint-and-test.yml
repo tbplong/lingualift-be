@@ -1,0 +1,43 @@
+name: Lint code
+on: workflow_call
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Enable corepack
+        run: |
+          npm i -g corepack
+          corepack enable
+
+      - name: Setup Node environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+
+      - name: Lint code
+        run: yarn lint
+
+      - name: Run unit tests
+        run: yarn test:ci
+
+      - name: Run integration tests
+        run: yarn test:integration:ci
+
+      - name: Report test results
+        uses: dorny/test-reporter@v2
+        if: success() || failure()
+        with:
+          name: Jest tests
+          path: reports/*/*-test.xml
+          reporter: jest-junit
