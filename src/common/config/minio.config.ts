@@ -7,6 +7,7 @@ export const minioConfig = registerAs('minio', () => {
     minioAccessKey: process.env.MINIO_ACCESS_KEY,
     minioSecretKey: process.env.MINIO_SECRET_KEY,
     minioPort: parseInt(process.env.MINIO_PORT, 10),
+    minioBucket: process.env.MINIO_BUCKET,
   };
 
   const validationSchema = z.object({
@@ -14,6 +15,7 @@ export const minioConfig = registerAs('minio', () => {
     minioAccessKey: z.string().min(1),
     minioSecretKey: z.string().min(1),
     minioPort: z.number().min(1),
+    minioBucket: z.string().min(1),
   });
 
   validationSchema.parse(values);

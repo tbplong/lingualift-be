@@ -22,6 +22,7 @@ export declare global {
       MINIO_USE_SSL: string;
       MINIO_ACCESS_KEY: string;
       MINIO_SECRET_KEY: string;
+      MINIO_BUCKET: string;
     }
   }
 
