@@ -123,7 +123,7 @@ describe('AuthService', () => {
       expect(usersService.findOne).toHaveBeenCalledTimes(1);
       expect(usersService.create).toHaveBeenCalledTimes(1);
       expect(jwtService.signAsync).toHaveBeenCalledTimes(1);
-      expect(result).toEqual({ access_token: mockAccessToken });
+      expect(result).toEqual(mockAccessToken);
     });
 
     it('should throw UnauthorizedException when user already exists', async () => {
