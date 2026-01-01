@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   IsBoolean,
   IsDateString,
@@ -7,10 +8,13 @@ import {
   IsString,
 } from 'class-validator';
 import { QuizType } from '../constants';
-import { Exclude, Expose, Type } from 'class-transformer';
+import { Exclude, Expose, Transform, Type } from 'class-transformer';
 import { Types } from 'mongoose';
 
 export class QuizDto {
+  @IsNotEmpty()
+  _id: Types.ObjectId;
+
   @IsNotEmpty()
   @IsString()
   title: string;
@@ -98,11 +102,13 @@ class QuizMetadata extends QuizDto {
 }
 
 export class QuizResponseDto {
+  // @Expose()
   // @Type(() => QuizDto)
   // quiz: QuizDto;
 
   @Expose()
-  _id: Types.ObjectId;
+  @Transform(({ obj }) => (<Types.ObjectId>obj._id).toString())
+  _id: string;
 
   @Expose()
   title: string;
@@ -117,7 +123,31 @@ export class QuizResponseDto {
   questions: QuestionDto[];
 }
 
-export class UpdateQuizDto extends QuizDto {
-  @Exclude()
-  _id?: never;
+export class UpdateQuizDto {
+  @IsNotEmpty()
+  @IsString()
+  title: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  time: number; // 50 (seconds)
+
+  @IsOptional()
+  @IsNumber()
+  maxAttempt: number; // optional
+
+  @IsNotEmpty()
+  @IsNumber()
+  questionsNo: number; // total number of questions
+
+  @IsOptional()
+  @IsDateString()
+  expiredAt: Date;
+
+  @IsOptional()
+  @IsBoolean()
+  isShowAnswer: boolean;
+
+  @IsNotEmpty()
+  questions: QuestionDto[];
 }

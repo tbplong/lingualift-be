@@ -9,9 +9,9 @@ import {
 } from '@nestjs/common';
 import {
   CreateQuizResponseDto,
-  QuizDto,
   QuizResponseDto,
   QuizsResponseDto,
+  UpdateQuizDto,
 } from '../dtos';
 // import { BlockIfNotManager } from 'src/auth/decorators';
 import { plainToInstance } from 'class-transformer';
@@ -25,7 +25,7 @@ export class QuizController {
   @Post('/')
   // @BlockIfNotManager(true)
   public async create(
-    @Body() quizDto: QuizDto,
+    @Body() quizDto: UpdateQuizDto,
   ): Promise<CreateQuizResponseDto> {
     const newQuiz = await this.quizService.createQuiz(quizDto);
     return plainToInstance(CreateQuizResponseDto, { newQuiz });
@@ -35,7 +35,7 @@ export class QuizController {
   // @BlockIfNotManager(true)
   public async update(
     @Param('id') id: Types.ObjectId,
-    @Body() quizDto: QuizDto,
+    @Body() quizDto: UpdateQuizDto,
   ): Promise<string> {
     const updatedQuiz = await this.quizService.updateQuizById(quizDto, id);
     return updatedQuiz;
@@ -47,6 +47,8 @@ export class QuizController {
     @Param('id') id: Types.ObjectId,
   ): Promise<QuizResponseDto> {
     const quiz = await this.quizService.readQuizById(id);
+    console.log('hello');
+    console.log({ ...quiz });
     return plainToInstance(QuizResponseDto, quiz, {
       excludeExtraneousValues: true,
     });

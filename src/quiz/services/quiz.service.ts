@@ -12,18 +12,18 @@ export class QuizService {
     @InjectModel(QuizCollectionName)
     private readonly quizModel: Model<QuizDocument>,
   ) {}
-  public async createQuiz(quizDto: QuizDto): Promise<Types.ObjectId> {
+  public async createQuiz(quizDto: UpdateQuizDto): Promise<Types.ObjectId> {
     const newQuiz = await this.quizModel.create(quizDto);
     return newQuiz._id;
   }
 
   public async updateQuizById(
-    quizDto: QuizDto,
+    quizDto: UpdateQuizDto,
     id: Types.ObjectId,
   ): Promise<string> {
     const updatedQuiz = await this.quizModel
       .findByIdAndUpdate(id, {
-        $set: plainToInstance(UpdateQuizDto, { ...quizDto }),
+        $set: plainToInstance(QuizDto, { ...quizDto }),
       })
       .lean();
     if (!updatedQuiz) throw new NotFoundException('Quiz not found');
@@ -32,13 +32,15 @@ export class QuizService {
 
   public async readQuiz(): Promise<QuizDto[]> {
     const quizs = await this.quizModel.find().lean();
-    if (!quizs.length) throw new NotFoundException('No quizs found');
+    // if (!quizs.length) throw new NotFoundException('No quizs found');
     return quizs;
   }
 
   public async readQuizById(id: Types.ObjectId): Promise<QuizDto> {
     const quizById = await this.quizModel.findById(id).lean();
     if (!quizById) throw new NotFoundException('Quiz not found');
+    console.log('hiiii');
+    console.log(quizById);
     return quizById;
   }
 

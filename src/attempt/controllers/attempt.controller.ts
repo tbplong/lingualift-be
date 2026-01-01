@@ -18,7 +18,6 @@ import {
   UpdateAttemptDto,
 } from '../dtos';
 import { User } from 'src/auth/decorators';
-import { Types } from 'mongoose';
 
 @Controller('attempts')
 export class AttemptController {
@@ -28,11 +27,11 @@ export class AttemptController {
   @Post('/')
   public async create(
     @Body() createAttemptDto: CreateAttemptDto,
-    @User() user: { _id: Types.ObjectId },
+    @User() user: Express.User,
   ): Promise<CreateAttemptResponseDto> {
     const newAttemptId = await this.attemptService.createAttempt(
       createAttemptDto,
-      user._id,
+      user.userId,
     );
     return plainToInstance(CreateAttemptResponseDto, { _id: newAttemptId });
   }
@@ -42,12 +41,10 @@ export class AttemptController {
   public async update(
     @Param('id') id: string,
     @Body() updateAttemptDto: UpdateAttemptDto,
-    @User() user: { _id: Types.ObjectId },
   ): Promise<AttemptDetailDto> {
     const updatedAttempt = await this.attemptService.updateAttempt(
       id,
       updateAttemptDto,
-      user._id,
     );
     return plainToInstance(AttemptDetailDto, updatedAttempt, {
       excludeExtraneousValues: true,
@@ -58,14 +55,13 @@ export class AttemptController {
   @Get('/')
   public async getByQuizId(
     @Query('quizId') quizId: string,
-    @Query('completedOnly') completedOnly: string,
-    @User() user: { _id: Types.ObjectId },
+    @User() user: Express.User,
+    @Query('completedOnly') completedOnly?: boolean,
   ): Promise<AttemptsResponseDto> {
-    const completed = completedOnly === 'true' ? true : undefined;
     const attempts = await this.attemptService.getAttemptsByQuizId(
       quizId,
-      user._id,
-      completed,
+      user.userId,
+      completedOnly,
     );
     return plainToInstance(
       AttemptsResponseDto,
@@ -78,11 +74,11 @@ export class AttemptController {
   @Get('/in-progress/:quizId')
   public async getInProgress(
     @Param('quizId') quizId: string,
-    @User() user: { _id: Types.ObjectId },
+    @User() user: Express.User,
   ): Promise<AttemptDetailDto | null> {
     const attempt = await this.attemptService.getInProgressAttempt(
       quizId,
-      user._id,
+      user.userId,
     );
     if (!attempt) return null;
     return plainToInstance(AttemptDetailDto, attempt, {
@@ -94,9 +90,9 @@ export class AttemptController {
   @Get('/:id')
   public async getById(
     @Param('id') id: string,
-    @User() user: { _id: Types.ObjectId },
+    @User() user: Express.User,
   ): Promise<AttemptDetailDto> {
-    const attempt = await this.attemptService.getAttemptById(id, user._id);
+    const attempt = await this.attemptService.getAttemptById(id, user.userId);
     return plainToInstance(AttemptDetailDto, attempt, {
       excludeExtraneousValues: true,
     });
@@ -106,8 +102,8 @@ export class AttemptController {
   @Delete('/:id')
   public async deleteById(
     @Param('id') id: string,
-    @User() user: { _id: Types.ObjectId },
+    @User() user: Express.User,
   ): Promise<string> {
-    return await this.attemptService.deleteAttemptById(id, user._id);
+    return await this.attemptService.deleteAttemptById(id, user.userId);
   }
 }

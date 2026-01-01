@@ -29,13 +29,13 @@ export class AttemptService {
   public async updateAttempt(
     attemptId: string,
     updateAttemptDto: UpdateAttemptDto,
-    userId: Types.ObjectId,
   ): Promise<AttemptDocument> {
+    console.log(attemptId);
+    console.log(11111);
     const updatedAttempt = await this.attemptModel
       .findOneAndUpdate(
         {
           _id: new Types.ObjectId(attemptId),
-          userId,
         },
         { $set: updateAttemptDto },
         { new: true },

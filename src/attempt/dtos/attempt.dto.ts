@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   IsArray,
   IsBoolean,
@@ -8,7 +9,7 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { Expose, Type } from 'class-transformer';
+import { Expose, Transform, Type } from 'class-transformer';
 import { Types } from 'mongoose';
 
 // Request DTO for creating/saving an attempt (supports both in-progress and completed)
@@ -102,15 +103,16 @@ export class UserAnswerDto {
   @IsNumber()
   selectedAnswer: number;
 
-  @IsNotEmpty()
-  @IsBoolean()
-  isCorrect: boolean;
+  // @IsNotEmpty()
+  // @IsBoolean()
+  // isCorrect: boolean;
 }
 
 // Response DTO for attempt list (without questions)
 export class AttemptListItemDto {
   @Expose()
-  _id: Types.ObjectId;
+  @Transform(({ obj }) => (<Types.ObjectId>obj._id).toString())
+  _id: string;
 
   @Expose()
   quizId: Types.ObjectId;
@@ -143,6 +145,9 @@ export class AttemptListItemDto {
   markedForReview: number[];
 
   @Expose()
+  answers: UserAnswerDto[];
+
+  @Expose()
   createdAt: Date;
 }
 
@@ -154,7 +159,8 @@ export class AttemptsResponseDto {
 
 export class AttemptDetailDto {
   @Expose()
-  _id: Types.ObjectId;
+  @Transform(({ obj }) => (<Types.ObjectId>obj._id).toString())
+  _id: string;
 
   @Expose()
   quizId: Types.ObjectId;
