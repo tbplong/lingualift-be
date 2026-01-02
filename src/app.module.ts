@@ -16,6 +16,8 @@ import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { ExceptionsFilter } from './common/filters';
 import { AuthGuard } from './auth/guards';
 import { LoggerModule } from 'nestjs-pino';
+import { QuizModule } from './quiz/quiz.module';
+import { AttemptModule } from './attempt/attempt.module';
 import { StorageModule } from './storage/storage.module';
 import { NationalExamModule } from './national-exam/national-exam.module';
 import { RedisModule } from './redis/redis.module';
@@ -48,6 +50,8 @@ import { RedisModule } from './redis/redis.module';
     }),
     AuthModule,
     UsersModule,
+    QuizModule,
+    AttemptModule,
     StorageModule,
     NationalExamModule,
     RedisModule,
