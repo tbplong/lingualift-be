@@ -4,6 +4,21 @@ import { AttemptCollectionName } from 'src/constants/schema';
 
 export type AttemptDocument = HydratedDocument<Attempt>;
 
+// Define the nested schema for UserAnswer BEFORE using it
+@Schema({ _id: false })
+export class UserAnswer {
+  @Prop({ required: true })
+  questionIndex: number;
+
+  @Prop({ required: true })
+  selectedAnswer: number;
+
+  @Prop({ required: true })
+  isCorrect: boolean;
+}
+
+export const UserAnswerSchema = SchemaFactory.createForClass(UserAnswer);
+
 @Schema({ timestamps: true, collection: AttemptCollectionName })
 export class Attempt {
   @Prop({ required: true, type: Types.ObjectId, ref: 'quizs' })
@@ -36,7 +51,7 @@ export class Attempt {
   @Prop({ required: true })
   public totalQuestions: number;
 
-  @Prop({ required: true })
+  @Prop({ type: [UserAnswerSchema], required: true })
   public answers: UserAnswer[];
 
   @Prop({ default: [] })
@@ -47,17 +62,6 @@ export class Attempt {
 
   @Prop()
   public updatedAt: Date;
-}
-
-class UserAnswer {
-  @Prop({ required: true })
-  questionIndex: number;
-
-  @Prop({ required: true })
-  selectedAnswer: number;
-
-  @Prop({ required: true })
-  isCorrect: boolean;
 }
 
 export const AttemptSchema = SchemaFactory.createForClass(Attempt);

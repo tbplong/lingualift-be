@@ -95,17 +95,20 @@ export class UpdateAttemptDto {
 }
 
 export class UserAnswerDto {
+  @Expose()
   @IsNotEmpty()
   @IsNumber()
   questionIndex: number;
 
+  @Expose()
   @IsNotEmpty()
   @IsNumber()
   selectedAnswer: number;
 
-  // @IsNotEmpty()
-  // @IsBoolean()
-  // isCorrect: boolean;
+  @Expose()
+  @IsOptional()
+  @IsBoolean()
+  isCorrect?: boolean;
 }
 
 // Response DTO for attempt list (without questions)
