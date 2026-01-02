@@ -11,6 +11,7 @@ import bcrypt from 'bcrypt';
 import { SALT_ROUNDS, PASSWORD_REGEX } from 'src/auth/constants';
 import { CreateUserDto } from '../dtos/users.dto';
 import { TokenService } from 'src/auth/services/token.service';
+import { ChangedInformation } from '../interface';
 
 @Injectable()
 export class UsersService {
@@ -63,6 +64,51 @@ export class UsersService {
     if (!user) {
       throw new Error('User not found for the provided token');
     }
+    return user;
+  }
+
+  public async editUserProfile(
+    userId: Types.ObjectId,
+    changedInformation: ChangedInformation,
+  ): Promise<UserDocument> {
+    const user = await this.userModel.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found ');
+    }
+
+    const { firstName, lastName, email, highSchool, address, socialMedia } =
+      changedInformation;
+
+    if (firstName) {
+      user.firstName = firstName;
+    }
+
+    if (lastName) {
+      user.lastName = lastName;
+    }
+
+    if (email) {
+      user.email = email;
+    }
+
+    if (highSchool) {
+      user.highSchool = highSchool;
+    }
+
+    if (address) {
+      user.address = address;
+    }
+
+    if (socialMedia) {
+      user.socialMedia = {
+        facebookName: socialMedia.facebookName,
+        facebookUrl: socialMedia.facebookUrl,
+      };
+    }
+
+    await user.save();
+
     return user;
   }
 }

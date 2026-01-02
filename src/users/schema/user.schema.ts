@@ -6,15 +6,15 @@ export type UserDocument = HydratedDocument<User>;
 
 export class SocialMedia {
   @Prop()
-  facebookUrl: string;
+  facebookUrl?: string;
 
   @Prop()
-  facebookName: string;
+  facebookName?: string;
 }
 
 @Schema({ timestamps: true, collection: UserCollectionName })
 export class User {
-  @Prop()
+  @Prop({ required: false })
   public googleId: string;
 
   @Prop()
@@ -44,14 +44,14 @@ export class User {
   @Prop()
   public password: string;
 
-  @Prop()
-  public socialMedia: SocialMedia;
+  @Prop({ required: false })
+  public socialMedia?: SocialMedia;
 
-  @Prop()
-  public highSchool: string;
+  @Prop({ required: false })
+  public highSchool?: string;
 
-  @Prop()
-  public address: string;
+  @Prop({ required: false })
+  public address?: string;
 
   @Prop({ default: 'A1' })
   level: string;

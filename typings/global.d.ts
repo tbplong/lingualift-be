@@ -16,6 +16,16 @@ export declare global {
 
       GOOGLE_CLIENT_ID: string;
       GOOGLE_CLIENT_SECRET: string;
+
+      MINIO_ENDPOINT: string;
+      MINIO_PORT: string;
+      MINIO_USE_SSL: string;
+      MINIO_ACCESS_KEY: string;
+      MINIO_SECRET_KEY: string;
+      MINIO_BUCKET: string;
+
+      REDIS_HOST: string;
+      REDIS_PORT: string;
     }
   }
 
