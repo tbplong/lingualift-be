@@ -87,21 +87,25 @@ export class NationalExamService {
     const dateSort = sort === 'desc' ? -1 : 1;
     const levelRange = level?.split('-').map((e) => Number(e));
     const firstFilter: FilterQuery<NationalExam> = {
-      $or: [
+      $and: [
         {
-          $and: [
-            search
-              ? {
-                  title: { $regex: `${search}`, $options: 'i' },
-                }
-              : {},
-            { isDeleted: false },
-            levelRange
-              ? { level: { $gte: levelRange[0], $lte: levelRange[1] } }
-              : {},
+          $or: [
+            {
+              $and: [
+                search
+                  ? {
+                      title: { $regex: `${search}`, $options: 'i' },
+                    }
+                  : {},
+                levelRange
+                  ? { level: { $gte: levelRange[0], $lte: levelRange[1] } }
+                  : {},
+              ],
+            },
+            { status: NationalExamStatus.HOT },
           ],
         },
-        { status: NationalExamStatus.HOT },
+        { isDeleted: false },
       ],
     };
 
