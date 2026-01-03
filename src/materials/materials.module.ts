@@ -8,5 +8,6 @@ import { Material, MaterialSchema } from './schemas/material.schema';
   imports: [MongooseModule.forFeature([{ name: Material.name, schema: MaterialSchema }])],
   controllers: [MaterialsController],
   providers: [MaterialsService],
+  exports: [MaterialsService],
 })
 export class MaterialsModule {}

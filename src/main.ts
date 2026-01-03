@@ -20,9 +20,6 @@ async function bootstrap(): Promise<string> {
   app.useGlobalFilters(new AllExceptionFilter(app.get(Logger)));
   app.useGlobalPipes(new ValidationPipe());
 
-  /* =======================
-     DEBUG STATIC FILE PATH
-     ======================= */
   const cwdUploads = join(process.cwd(), 'uploads');
   const dirUploads = join(__dirname, '..', 'uploads');
 
@@ -35,7 +32,6 @@ async function bootstrap(): Promise<string> {
   NestLogger.log(`exists test.pdf in cwd? = ${existsSync(join(cwdUploads, 'test.pdf'))}`, 'STATIC');
   NestLogger.log(`exists test.pdf in dir? = ${existsSync(join(dirUploads, 'test.pdf'))}`, 'STATIC');
 
-  // 🔴 QUAN TRỌNG: dùng path CHẮC ĂN
   app.useStaticAssets(dirUploads, { prefix: '/uploads' });
 
   // Express Middleware
