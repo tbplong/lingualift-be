@@ -32,8 +32,8 @@ jobs:
         run: |
           npm run build
 
-      - name: Run test 
-        run : npm test
+      - name: Run test
+        run: npm test
 
       - name: Copy build to server
         uses: burnett01/rsync-deployments@6.0.0
