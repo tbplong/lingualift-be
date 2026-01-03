@@ -73,7 +73,7 @@ export class AuthGuard implements CanActivate {
         CustomDecoratorKey.BLOCK_IF_NOT_MANAGER,
       );
       if (shouldBlockIfNotManager && !user.isManager) {
-        throw new ForbiddenException();
+        throw new ForbiddenException('Không có quyền truy cập');
       }
 
       request.user = {
@@ -81,19 +81,19 @@ export class AuthGuard implements CanActivate {
         email: user.email,
         userId: user._id,
       };
-      await this.cacheService.set(
+      await this.cacheService.set<TokenInfoInterface>(
         tokenId.toString(),
-        JSON.stringify({
+        {
           isManager: user.isManager,
           email: user.email,
           userId: user._id,
-        }),
+        },
         DEFAULT_CACHE_TTL,
       );
     } catch {
       const shouldBlock = this.getShouldBlockIfNotManager(context);
       if (shouldBlock) {
-        throw new ForbiddenException();
+        throw new ForbiddenException('Không có quyền truy cập');
       }
     }
     return true;

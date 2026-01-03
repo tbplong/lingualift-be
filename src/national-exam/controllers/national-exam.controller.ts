@@ -80,11 +80,13 @@ export class NationalExamController {
   @BlockIfNotManager(true)
   public async updateNationalExam(
     @Param('examId', ObjectIdTransformPipe) examId: Types.ObjectId,
+    @User() user: Express.User,
     @Body() updateNationalExamRequestDto: UpdateNationalExamRequestDto,
   ): Promise<void> {
     await this.nationalExamService.updateNationalExam(
       examId,
       updateNationalExamRequestDto,
+      user.userId,
     );
   }
 }
