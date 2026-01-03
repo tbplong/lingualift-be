@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   Logger,
   NotFoundException,
@@ -160,13 +161,16 @@ export class NationalExamService {
   public async updateNationalExam(
     examId: Types.ObjectId,
     updateNationalExamRequestInterface: UpdateNationalExamRequestInterface,
+    userId: Types.ObjectId,
   ): Promise<void> {
     const { title, status, level, questions, videoLink } =
       updateNationalExamRequestInterface;
     const nationalExam = await this.nationalExamModel.findById(examId);
     if (!nationalExam || nationalExam.isDeleted)
       throw new NotFoundException('Không tìm thấy đề thi');
-
+    if (!nationalExam.createdBy.equals(userId)) {
+      throw new ForbiddenException('Không có quyền chỉnh sửa đề thi');
+    }
     const updateFields: Partial<UpdateNationalExamRequestInterface> = {};
     if (title) {
       updateFields.title = title;

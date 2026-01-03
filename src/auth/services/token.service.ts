@@ -60,9 +60,9 @@ export class TokenService {
       userId,
       expiredAt: dayjs().add(365, 'day').toDate(),
     });
-    await this.cacheService.set(
+    await this.cacheService.set<TokenInfoInterface>(
       token._id.toString(),
-      JSON.stringify(tokenInfo),
+      tokenInfo,
       DEFAULT_CACHE_TTL,
     );
     return { tokenId: token._id };

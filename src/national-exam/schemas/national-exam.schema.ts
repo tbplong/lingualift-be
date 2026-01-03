@@ -1,6 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
-import { NationalExamCollectionName } from 'src/constants/schema';
+import { HydratedDocument, Types } from 'mongoose';
+import {
+  NationalExamCollectionName,
+  UserCollectionName,
+} from 'src/constants/schema';
 
 export type NationalExamDocument = HydratedDocument<NationalExam>;
 
@@ -42,6 +45,9 @@ export class NationalExam {
 
   @Prop({ required: true })
   public videoLink: string;
+
+  @Prop({ ref: UserCollectionName })
+  public createdBy: Types.ObjectId;
 }
 
 export const NationalExamSchema = SchemaFactory.createForClass(NationalExam);
