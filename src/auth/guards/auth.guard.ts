@@ -10,6 +10,8 @@ import { Request } from 'express';
 import { CustomDecoratorKey } from 'src/common/custom-decorator-keys';
 
 import { TokenService } from '../services';
+import { CacheService, DEFAULT_CACHE_TTL } from 'src/redis/services';
+import { TokenInfoInterface } from '../interfaces';
 
 /**
  * Provides authentication for routes that it is applied to.
@@ -22,6 +24,7 @@ export class AuthGuard implements CanActivate {
   constructor(
     private tokenService: TokenService,
     private reflector: Reflector,
+    private cacheService: CacheService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -34,6 +37,22 @@ export class AuthGuard implements CanActivate {
       const { tokenId } = this.tokenService.readAccessToken(token);
 
       await this.tokenService.getValidToken(tokenId);
+      const cachedUser = await this.cacheService.get<TokenInfoInterface>(tokenId.toString());
+      if (cachedUser) {
+        const shouldBlockIfNotManager = this.getShouldBlockByDecoratorKey(
+          context,
+          CustomDecoratorKey.BLOCK_IF_NOT_MANAGER,
+        );
+        if (shouldBlockIfNotManager && !cachedUser.isManager) {
+          throw new ForbiddenException();
+        }
+
+        request.user = {
+          tokenId,
+          email: cachedUser.email,
+          userId: cachedUser.userId,
+        };
+      }
 
       const user = await this.tokenService.getUserByTokenId(tokenId);
       if (!user) {
@@ -58,6 +77,15 @@ export class AuthGuard implements CanActivate {
         email: user.email,
         userId: user._id,
       };
+      await this.cacheService.set(
+        tokenId.toString(),
+        JSON.stringify({
+          isManager: user.isManager,
+          email: user.email,
+          userId: user._id,
+        }),
+        DEFAULT_CACHE_TTL,
+      );
     } catch {
       const shouldBlock = this.getShouldBlockIfNotManager(context);
       if (shouldBlock) {

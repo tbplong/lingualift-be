@@ -13,6 +13,7 @@ import { TokenService } from './services/token.service';
 import { GoogleAuthController } from './controllers/google-auth.controller';
 import { GoogleAuthService } from './services/google-auth.service';
 import { OAuth2Client } from 'google-auth-library';
+import { RedisModule } from 'src/redis/redis.module';
 
 @Global()
 @Module({
@@ -25,6 +26,7 @@ import { OAuth2Client } from 'google-auth-library';
       }),
       inject: [authConfig.KEY],
     }),
+    RedisModule,
   ],
   providers: [
     AuthService,

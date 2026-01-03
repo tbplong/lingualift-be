@@ -11,8 +11,8 @@ export class MinioStorageController {
   @BlockIfNotManager(true)
   public async getPresignedUrl(@Body() body: { key: string }) {
     const url = await this.minioStorageService.getPresignedUploadUrl(
-      'booking-classroom-assets',
-      `booking-database/${body.key}`,
+      process.env.MINIO_BUCKET,
+      `${body.key}`,
     );
     return { url };
   }

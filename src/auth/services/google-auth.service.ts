@@ -141,7 +141,11 @@ export class GoogleAuthService {
       password: null,
     });
 
-    const tokenInfo = { userId: newUser._id };
+    const tokenInfo = {
+      userId: newUser._id,
+      email: newUser.email,
+      isManager: newUser.isManager,
+    };
     const { tokenId } = await this.tokenService.create(tokenInfo);
 
     return {
@@ -161,7 +165,11 @@ export class GoogleAuthService {
   private async generateLoginTokenForExistingAccount(
     existingUser: UserDocument,
   ): Promise<GoogleLoginToken> {
-    const tokenInfo = { userId: existingUser._id };
+    const tokenInfo = {
+      userId: existingUser._id,
+      email: existingUser.email,
+      isManager: existingUser.isManager,
+    };
     await this.lock.acquire(`${existingUser.email}`);
     try {
       const { tokenId } = await this.tokenService.create(tokenInfo);
